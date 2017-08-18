@@ -27,7 +27,7 @@ along with GCC; see the file COPYING3.  If not see
 #define LIB_SPEC "--start-group -lc -lgloss --end-group"
 
 #undef  STARTFILE_SPEC
-#define STARTFILE_SPEC "crt0%O%s crtbegin%O%s"
+#define STARTFILE_SPEC "ri5cy-interrupts%O%s crt0%O%s crtbegin%O%s"
 
 #undef  ENDFILE_SPEC
 #define ENDFILE_SPEC "crtend%O%s"
