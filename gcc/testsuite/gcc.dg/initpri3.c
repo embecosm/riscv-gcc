@@ -1,5 +1,6 @@
 /* { dg-do run { target init_priority } } */
 /* { dg-require-effective-target lto } */
+/* { dg-require-effective-target global_constructor } */
 /* { dg-options "-flto -O3" } */
 
 extern void abort ();

@@ -1,4 +1,5 @@
 /* { dg-do run { target init_priority } } */
+/* { dg-require-effective-target global_constructor } */
 
 extern void abort ();
 

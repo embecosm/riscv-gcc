@@ -1,5 +1,11 @@
 2017-09-19  Edward Jones  <ed.jones@embecosm.com>
 
+	* gcc.dg/initpri1.c: Mark as requiring global constructor
+	support.
+	* gcc.dg/initpri3.c: Likewise.
+
+2017-09-19  Edward Jones  <ed.jones@embecosm.com>
+
 	* gcc.dg/gimplefe-14.c: Skip on riscv as argc is always 0 on
 	a freestanding environment.
 
