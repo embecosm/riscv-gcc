@@ -1,4 +1,11 @@
 2017-09-19  Edward Jones  <ed.jones@embecosm.com>
 
+	* gcc.dg/cleanup-12.c: skip on riscv as there is missing runtime
+	support for libgcc dwarf unwinding on ri5cy.
+	* gcc.dg/cleanup-13.c: Likewise.
+	* gcc.dg/cleanup-5.c: Likewise.
+
+2017-09-19  Edward Jones  <ed.jones@embecosm.com>
+
 	* gcc.c-torture/execute/pr60822.c: Skip on riscv as there is not
 	enough space on ri5cy for the .bss section.
