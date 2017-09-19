@@ -1,5 +1,10 @@
 2017-09-19  Edward Jones  <ed.jones@embecosm.com>
 
+	* gcc.dg/gimplefe-14.c: Skip on riscv as argc is always 0 on
+	a freestanding environment.
+
+2017-09-19  Edward Jones  <ed.jones@embecosm.com>
+
 	* gcc.dg/cleanup-12.c: skip on riscv as there is missing runtime
 	support for libgcc dwarf unwinding on ri5cy.
 	* gcc.dg/cleanup-13.c: Likewise.
