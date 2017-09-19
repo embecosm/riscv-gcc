@@ -1,5 +1,12 @@
 2017-09-19  Edward Jones  <ed.jones@embecosm.com>
 
+	* lib/target-supports.exp
+	(check_effective_target_global_constructor): Check for
+	gcc,no_global_constructor in target_info to determine
+	whether constructors/destructors are supported.
+
+2017-09-19  Edward Jones  <ed.jones@embecosm.com>
+
 	* gcc.dg/initpri1.c: Mark as requiring global constructor
 	support.
 	* gcc.dg/initpri3.c: Likewise.
