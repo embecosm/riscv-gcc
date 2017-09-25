@@ -1,6 +1,6 @@
 /* { dg-do run } */
 /* { dg-options "-O -fgimple" } */
-/* { dg-skip-if "argc always zero in freestanding env" { riscv*-elf } } */
+/* { dg-skip-if "argc always zero in freestanding env" { riscv*-*-elf } } */
 
 int __GIMPLE ()
 main (int argc, char * * argv)

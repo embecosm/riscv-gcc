@@ -1,3 +1,12 @@
+2017-09-25  Edward Jones  <ed.jones@embecosm.com>
+
+	* gcc.c-torture/execute/pr60822.c: Fix target selector (from
+	riscv*-elf to riscv*-*-elf.
+	* gcc.dg/cleanup-12.c: Likewise.
+	* gcc.dg/cleanup-13.c: Likewise.
+	* gcc.dg/cleanup-5.c: Likewise.
+	* gcc.dg/gimplefe-14.c: Likewise.
+
 2017-09-19  Edward Jones  <ed.jones@embecosm.com>
 
 	* lib/target-supports.exp

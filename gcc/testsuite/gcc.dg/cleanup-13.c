@@ -3,7 +3,7 @@
 /* { dg-options "-fexceptions" } */
 /* { dg-skip-if "" { "ia64-*-hpux11.*" } } */
 /* { dg-skip-if "" { ! nonlocal_goto } } */
-/* { dg-skip-if "" { "riscv*-elf" } } */
+/* { dg-skip-if "" { "riscv*-*-elf" } } */
 /* Verify DW_OP_* handling in the unwinder.  */
 
 #include <unwind.h>
