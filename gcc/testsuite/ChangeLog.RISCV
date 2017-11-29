@@ -1,3 +1,8 @@
+2017-11-29  Jeremy Bennett  <jeremy.bennett@embecosm.com>
+
+	* lib/gcc-dg.exp: Provide a wrapper around proc dg-test to set
+	trace filename based on arguments.
+
 2017-09-25  Edward Jones  <ed.jones@embecosm.com>
 
 	* gcc.c-torture/execute/pr60822.c: Fix target selector (from

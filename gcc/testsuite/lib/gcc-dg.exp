@@ -32,6 +32,51 @@ load_lib torture-options.exp
 load_lib fortran-modules.exp
 load_lib multiline.exp
 
+# Embecosm modification
+
+rename dg-test saved-dg-test
+
+proc dg-test {args} {
+    global trace-filename
+    global srcdir
+
+    set i 0
+
+    if { [string index [lindex $args 0] 0] == "-" } {
+	for { set i 0 } { $i < [llength $args] } { incr i } {
+	    if { [lindex $args $i] == "--" } {
+		incr i
+		break
+	    } elseif { [lindex $args $i] != "-keep-output" } {
+		break
+	    }
+	}
+    }
+
+    set prog [lindex $args $i]
+    set tool_flags [lindex $args [expr {$i + 1}]]
+    set trace-filename [dg-trim-dirname $srcdir $prog]
+
+    # If we couldn't rip $srcdir out of `prog' then just do the best we can.
+    # The point is to reduce the unnecessary noise in the logs.  Don't strip
+    # out too much because different testcases with the same name can confuse
+    # `test-tool'.
+    if {[string match "/*" ${trace-filename}]} {
+	set trace-filename "[file tail [file dirname $prog]]/[file tail $prog]"
+    }
+
+    # We append the compilation flags, if any, to ensure that the test case
+    # names are unique.
+    if { "$tool_flags" != "" } {
+	set trace-filename "${trace-filename} $tool_flags"
+    }
+
+    set trace-filename [string map {"/" "-" "\t" "-" " " "-"} ${trace-filename}]
+    verbose "trace filename is \"${trace-filename}\"" 2
+    verbose "args are \"${args}\"" 2
+    eval saved-dg-test $args
+}
+
 # We set LC_ALL and LANG to C so that we get the same error messages as expected.
 setenv LC_ALL C
 setenv LANG C
