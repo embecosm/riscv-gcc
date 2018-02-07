@@ -299,11 +299,16 @@ along with GCC; see the file COPYING3.  If not see
 
    The prologue registers mustn't conflict with any
    incoming arguments, the static chain pointer, or the frame pointer.
-   The epilogue temporary mustn't conflict with the return registers,
+   The epilogue temporaries mustn't conflict with the return registers,
    the frame pointer, the EH stack adjustment, or the EH data registers. */
 
 #define RISCV_PROLOGUE_TEMP_REGNUM (GP_TEMP_FIRST + 1)
 #define RISCV_PROLOGUE_TEMP(MODE) gen_rtx_REG (MODE, RISCV_PROLOGUE_TEMP_REGNUM)
+
+#define RISCV_EPILOGUE_TEMP_REGNUM (GP_TEMP_FIRST + 1)
+#define RISCV_EPILOGUE_TEMP(MODE) gen_rtx_REG (MODE, RISCV_EPILOGUE_TEMP_REGNUM)
+#define RISCV_EPILOGUE_TEMP2_REGNUM (GP_TEMP_FIRST + 2)
+#define RISCV_EPILOGUE_TEMP2(MODE) gen_rtx_REG (MODE, RISCV_EPILOGUE_TEMP2_REGNUM)
 
 #define MCOUNT_NAME "_mcount"
 

@@ -3876,8 +3876,8 @@ riscv_expand_epilogue (int style)
       rtx adjust = GEN_INT (-frame->hard_frame_pointer_offset);
       if (!SMALL_OPERAND (INTVAL (adjust)))
 	{
-	  riscv_emit_move (RISCV_PROLOGUE_TEMP (Pmode), adjust);
-	  adjust = RISCV_PROLOGUE_TEMP (Pmode);
+	  riscv_emit_move (RISCV_EPILOGUE_TEMP (Pmode), adjust);
+	  adjust = RISCV_EPILOGUE_TEMP (Pmode);
 	}
 
       insn = emit_insn (
@@ -3914,8 +3914,8 @@ riscv_expand_epilogue (int style)
       rtx adjust = GEN_INT (step1);
       if (!SMALL_OPERAND (step1))
 	{
-	  riscv_emit_move (RISCV_PROLOGUE_TEMP (Pmode), adjust);
-	  adjust = RISCV_PROLOGUE_TEMP (Pmode);
+	  riscv_emit_move (RISCV_EPILOGUE_TEMP (Pmode), adjust);
+	  adjust = RISCV_EPILOGUE_TEMP (Pmode);
 	}
 
       insn = emit_insn (
