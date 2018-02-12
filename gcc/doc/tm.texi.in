@@ -2373,6 +2373,7 @@ This describes the stack layout and calling conventions.
 * Tail Calls::
 * Shrink-wrapping separate components::
 * Stack Smashing Protection::
+* Stack Erase::
 * Miscellaneous Register Hooks::
 @end menu
 
@@ -3668,6 +3669,12 @@ generic code.
 @hook TARGET_STACK_PROTECT_RUNTIME_ENABLED_P
 
 @hook TARGET_SUPPORTS_SPLIT_STACK
+
+@node Stack Erase
+@subsection Stack erase
+@cindex stack erase
+
+@hook TARGET_EMIT_STACK_ERASE
 
 @node Miscellaneous Register Hooks
 @subsection Miscellaneous register hooks

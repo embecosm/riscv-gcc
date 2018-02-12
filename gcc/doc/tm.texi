@@ -2945,6 +2945,7 @@ This describes the stack layout and calling conventions.
 * Tail Calls::
 * Shrink-wrapping separate components::
 * Stack Smashing Protection::
+* Stack Erase::
 * Miscellaneous Register Hooks::
 @end menu
 
@@ -5055,6 +5056,14 @@ Returns true if the target wants GCC's default stack protect runtime support, ot
 
 @deftypefn {Common Target Hook} bool TARGET_SUPPORTS_SPLIT_STACK (bool @var{report}, struct gcc_options *@var{opts})
 Whether this target supports splitting the stack when the options described in @var{opts} have been passed.  This is called after options have been parsed, so the target may reject splitting the stack in some configurations.  The default version of this hook returns false.  If @var{report} is true, this function may issue a warning or error; if @var{report} is false, it must simply return a value
+@end deftypefn
+
+@node Stack Erase
+@subsection Stack erase
+@cindex stack erase
+
+@deftypefn {Target Hook} void TARGET_EMIT_STACK_ERASE (rtx @var{new_sp_val})
+Define this hook to emit stack erase code, if the target supports it.
 @end deftypefn
 
 @node Miscellaneous Register Hooks

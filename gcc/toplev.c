@@ -1768,6 +1768,9 @@ process_options (void)
       flag_sanitize &= ~SANITIZE_ADDRESS;
     }
 
+  if (flag_stack_erase && !targetm.emit_stack_erase)
+    error_at (UNKNOWN_LOCATION, "-fstack-erase not supported for this target");
+
  /* Do not use IPA optimizations for register allocation if profiler is active
     or patchable function entries are inserted for run-time instrumentation
     or port does not emit prologue and epilogue as RTL.  */

@@ -376,6 +376,12 @@ can_inline_edge_p (struct cgraph_edge *e, bool report,
       e->inline_failed = CIF_ATTRIBUTE_MISMATCH;
       inlinable = false;
     }
+  /* Don't inline a function with the stack_erase attribute.  */
+  else if (lookup_attribute ("stack_erase", DECL_ATTRIBUTES (callee->decl)))
+    {
+      e->inline_failed = CIF_STACK_ERASE;
+      inlinable = false;
+    }
   if (!inlinable && report)
     report_inline_failed_reason (e);
   return inlinable;

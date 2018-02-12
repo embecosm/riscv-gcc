@@ -678,6 +678,7 @@ MAINT
 zlibinc
 zlibdir
 HOST_LIBS
+enable_default_stack_erase
 enable_default_ssp
 thin_archive_support
 ld_soname_option
@@ -948,6 +949,7 @@ enable_gnu_unique_object
 enable_linker_build_id
 enable_libssp
 enable_default_ssp
+enable_default_stack_erase
 with_long_double_128
 with_long_double_format
 with_gc
@@ -1691,6 +1693,8 @@ Optional Features:
                           compiler will always pass --build-id to linker
   --enable-libssp         enable linking against libssp
   --enable-default-ssp    enable Stack Smashing Protection as default
+  --enable-default-stack-erase
+                          enable Stack Erase by default
   --enable-maintainer-mode
                           enable make rules and dependencies not useful (and
                           sometimes confusing) to the casual installer
@@ -18460,7 +18464,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 18463 "configure"
+#line 18467 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -18566,7 +18570,7 @@ else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
   lt_status=$lt_dlunknown
   cat > conftest.$ac_ext <<_LT_EOF
-#line 18569 "configure"
+#line 18573 "configure"
 #include "confdefs.h"
 
 #if HAVE_DLFCN_H
@@ -29346,6 +29350,26 @@ fi
 if test x$enable_default_ssp = xyes ; then
 
 $as_echo "#define ENABLE_DEFAULT_SSP 1" >>confdefs.h
+
+fi
+
+
+# Check whether --enable-default-stack-erase was given.
+# Check whether --enable-default-stack-erase was given.
+if test "${enable_default_stack_erase+set}" = set; then :
+  enableval=$enable_default_stack_erase;
+case "$target" in
+  riscv*-*-*) enable_default_stack_erase=$enableval ;;
+  *) as_fn_error "Default stack erase is not supported on this target." "$LINENO" 5 ;;
+esac
+
+else
+  enable_default_stack_erase=no
+fi
+
+if test x$enable_default_stack_erase = xyes ; then
+
+$as_echo "#define ENABLE_DEFAULT_STACK_ERASE 1" >>confdefs.h
 
 fi
 

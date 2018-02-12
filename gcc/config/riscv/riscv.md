@@ -65,6 +65,9 @@
   UNSPECV_BLOCKAGE
   UNSPECV_FENCE
   UNSPECV_FENCE_I
+
+  ;; Stack erase
+  UNSPECV_STACK_ERASE
 ])
 
 (define_constants
@@ -2353,6 +2356,14 @@
   ""
   ""
   [(set_attr "length" "0")]
+)
+
+(define_insn "stack_erase"
+ [(unspec_volatile [(match_operand 0 "pmode_register_operand" "=r")
+                    (match_operand 1 "pmode_register_operand" "r")]
+                   UNSPECV_STACK_ERASE)]
+ ""
+ "\n1:\nbeq\t%0,%1,2f\n\tsw\tx0,0(%0)\n\taddi\t%0,%0,4\n\tj\t1b\n2:"
 )
 
 (include "sync.md")

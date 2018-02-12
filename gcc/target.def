@@ -6581,6 +6581,12 @@ HOOK_VECTOR_END (mode_switching)
 #undef HOOK_PREFIX
 #define HOOK_PREFIX "TARGET_"
 
+DEFHOOK
+(emit_stack_erase,
+ "Define this hook to emit stack erase code, if the target supports it.",
+ void, (rtx new_sp_val),
+ NULL)
+
 #define DEF_TARGET_INSN(NAME, PROTO) \
   DEFHOOK_UNDOC (have_##NAME, "", bool, (void), false)
 #include "target-insns.def"

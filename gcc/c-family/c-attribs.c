@@ -63,6 +63,7 @@ static tree handle_no_sanitize_undefined_attribute (tree *, tree, tree, int,
 static tree handle_asan_odr_indicator_attribute (tree *, tree, tree, int,
 						 bool *);
 static tree handle_stack_protect_attribute (tree *, tree, tree, int, bool *);
+static tree handle_stack_erase_attribute (tree *, tree, tree, int, bool *);
 static tree handle_noinline_attribute (tree *, tree, tree, int, bool *);
 static tree handle_noclone_attribute (tree *, tree, tree, int, bool *);
 static tree handle_nocf_check_attribute (tree *, tree, tree, int, bool *);
@@ -455,6 +456,8 @@ const struct attribute_spec c_common_attribute_table[] =
 			      NULL },
   { "nocf_check",	      0, 0, false, true, true, true,
 			      handle_nocf_check_attribute, NULL },
+  { "stack_erase",            0, 0, true,  false, false, false,
+			      handle_stack_erase_attribute, NULL },
   { NULL,                     0, 0, false, false, false, false, NULL, NULL }
 };
 
@@ -788,6 +791,27 @@ handle_stack_protect_attribute (tree *node, tree name, tree, int,
       warning (OPT_Wattributes, "%qE attribute ignored", name);
       *no_add_attrs = true;
     }
+
+  return NULL_TREE;
+}
+
+
+/* Handle a "stack_erase" attribute; arguments as in
+   struct attribute_spec.handler.  */
+
+static tree
+handle_stack_erase_attribute (tree *node, tree name, tree, int,
+		              bool *no_add_attrs)
+{
+  if (TREE_CODE (*node) != FUNCTION_DECL)
+    {
+      warning (OPT_Wattributes, "%qE attribute ignored", name);
+      *no_add_attrs = true;
+    }
+
+  if (!targetm.emit_stack_erase)
+    error_at (DECL_SOURCE_LOCATION (*node),
+              "stack erase is not supported on this target");
 
   return NULL_TREE;
 }

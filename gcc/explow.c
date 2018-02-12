@@ -41,6 +41,8 @@ along with GCC; see the file COPYING3.  If not see
 #include "common/common-target.h"
 #include "output.h"
 #include "params.h"
+#include "stringpool.h"
+#include "attribs.h"
 
 static rtx break_out_memory_refs (rtx);
 static void anti_adjust_stack_and_probe_stack_clash (rtx);
@@ -1136,6 +1138,10 @@ emit_stack_restore (enum save_level save_level, rtx sa)
     }
 
   discard_pending_stack_adjust ();
+
+  if (flag_stack_erase
+      || lookup_attribute ("stack_erase", DECL_ATTRIBUTES (cfun->decl)))
+    targetm.emit_stack_erase (sa);
 
   emit_insn (fcn (stack_pointer_rtx, sa));
 }

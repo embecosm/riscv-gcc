@@ -5986,6 +5986,22 @@ if test x$enable_default_ssp = xyes ; then
 fi
 AC_SUBST([enable_default_ssp])
 
+# Check whether --enable-default-stack-erase was given.
+AC_ARG_ENABLE(default-stack-erase,
+[AS_HELP_STRING([--enable-default-stack-erase],
+  [enable Stack Erase by default])],[
+case "$target" in
+  riscv*-*-*) enable_default_stack_erase=$enableval ;;
+  *) AC_MSG_ERROR([Default stack erase is not supported on this target.]) ;;
+esac
+],
+enable_default_stack_erase=no)
+if test x$enable_default_stack_erase = xyes ; then
+  AC_DEFINE(ENABLE_DEFAULT_STACK_ERASE, 1,
+      [Define if your target supports default stack erase and it is enabled.])
+fi
+AC_SUBST([enable_default_stack_erase])
+
 # Test for <sys/sdt.h> on the target.
 GCC_TARGET_TEMPLATE([HAVE_SYS_SDT_H])
 AC_MSG_CHECKING(sys/sdt.h in the target C library)

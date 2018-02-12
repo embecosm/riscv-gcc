@@ -2399,6 +2399,10 @@ fstack-protector-explicit
 Common Report RejectNegative Var(flag_stack_protect, 4) Optimization
 Use stack protection method only for functions with the stack_protect attribute.
 
+fstack-erase
+Common Report Var(flag_stack_erase, 1) Init(-1) Optimization
+Use stack erase for every function.
+
 fstack-usage
 Common RejectNegative Var(flag_stack_usage)
 Output stack usage information on a per-function basis.

@@ -3725,6 +3725,16 @@ riscv_emit_stack_tie (void)
     emit_insn (gen_stack_tiedi (stack_pointer_rtx, hard_frame_pointer_rtx));
 }
 
+/* Implement TARGET_EMIT_STACK_ERASE.  */
+
+void
+riscv_emit_stack_erase (rtx new_sp_val)
+{
+  new_sp_val = force_reg (Pmode, new_sp_val);
+
+  emit_insn (gen_stack_erase (stack_pointer_rtx, new_sp_val));
+}
+
 /* Expand the "prologue" pattern.  */
 
 void
@@ -3866,6 +3876,10 @@ riscv_expand_epilogue (int style)
       return;
     }
 
+  /* Store the starting value of SP in TEMP2 - can't use TEMP1 because the
+     epilogue also requires it.  */
+  riscv_emit_move (RISCV_EPILOGUE_TEMP2 (Pmode), stack_pointer_rtx);
+
   /* Move past any dynamic stack allocations.  */
   if (cfun->calls_alloca)
     {
@@ -3979,6 +3993,11 @@ riscv_expand_epilogue (int style)
     emit_insn (gen_add3_insn (stack_pointer_rtx, stack_pointer_rtx,
 			      EH_RETURN_STACKADJ_RTX));
 
+  if (flag_stack_erase
+      || lookup_attribute ("stack_erase", DECL_ATTRIBUTES (cfun->decl)))
+    emit_insn (gen_stack_erase (RISCV_EPILOGUE_TEMP2 (Pmode),
+                                stack_pointer_rtx));
+
   /* Return from interrupt.  */
   if (cfun->machine->interrupt_handler_p)
     {
@@ -3987,11 +4006,11 @@ riscv_expand_epilogue (int style)
       gcc_assert (mode != UNKNOWN_MODE);
 
       if (mode == MACHINE_MODE)
-	emit_jump_insn (gen_riscv_mret ());
+  emit_jump_insn (gen_riscv_mret ());
       else if (mode == SUPERVISOR_MODE)
-	emit_jump_insn (gen_riscv_sret ());
+  emit_jump_insn (gen_riscv_sret ());
       else
-	emit_jump_insn (gen_riscv_uret ());
+  emit_jump_insn (gen_riscv_uret ());
     }
   else if (style != SIBCALL_RETURN)
     emit_jump_insn (gen_simple_return_internal (ra));
@@ -4835,6 +4854,9 @@ riscv_constant_alignment (const_tree exp, HOST_WIDE_INT align)
 /* The low bit is ignored by jump instructions so is safe to use.  */
 #undef TARGET_CUSTOM_FUNCTION_DESCRIPTORS
 #define TARGET_CUSTOM_FUNCTION_DESCRIPTORS 1
+
+#undef TARGET_EMIT_STACK_ERASE
+#define TARGET_EMIT_STACK_ERASE riscv_emit_stack_erase
 
 struct gcc_target targetm = TARGET_INITIALIZER;
 

@@ -1366,6 +1366,18 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 # define DEFAULT_FLAG_SSP 0
 #endif
 
+/* Default value for flag_stack_erase when flag_stack_erase is initialized to -1:
+   --enable-default-stack-erase: Default flag_stack_erase to 1.
+   --disable-default-stack-erase: Default flag_stack_erase to 0.
+ */
+#ifdef ENABLE_DEFAULT_STACK_ERASE
+# ifndef DEFAULT_FLAG_STACK_ERASE
+#  define DEFAULT_FLAG_STACK_ERASE 1
+# endif
+#else
+# define DEFAULT_FLAG_STACK_ERASE 0
+#endif
+
 /* Provide default values for the macros controlling stack checking.  */
 
 /* The default is neither full builtin stack checking...  */
