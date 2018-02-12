@@ -3582,6 +3582,16 @@ riscv_emit_stack_tie (void)
     emit_insn (gen_stack_tiedi (stack_pointer_rtx, hard_frame_pointer_rtx));
 }
 
+/* Implement TARGET_EMIT_STACK_ERASE.  */
+
+void
+riscv_emit_stack_erase (rtx new_sp_val)
+{
+  new_sp_val = force_reg (Pmode, new_sp_val);
+
+  emit_insn (gen_stack_erase (stack_pointer_rtx, new_sp_val));
+}
+
 /* Expand the "prologue" pattern.  */
 
 void
@@ -3727,6 +3737,10 @@ riscv_expand_epilogue (bool sibcall_p)
       return;
     }
 
+  /* Store the starting value of SP in TEMP2 - can't use TEMP1 because the
+     epilogue also requires it.  */
+  riscv_emit_move (RISCV_EPILOGUE_TEMP2 (Pmode), stack_pointer_rtx);
+
   /* Move past any dynamic stack allocations.  */
   if (cfun->calls_alloca)
     {
@@ -3838,6 +3852,11 @@ riscv_expand_epilogue (bool sibcall_p)
   if (crtl->calls_eh_return)
     emit_insn (gen_add3_insn (stack_pointer_rtx, stack_pointer_rtx,
 			      EH_RETURN_STACKADJ_RTX));
+
+  if (flag_stack_erase
+      || lookup_attribute ("stack_erase", DECL_ATTRIBUTES (cfun->decl)))
+    emit_insn (gen_stack_erase (RISCV_EPILOGUE_TEMP2 (Pmode),
+                                stack_pointer_rtx));
 
   if (!sibcall_p)
     emit_jump_insn (gen_simple_return_internal (ra));
@@ -4552,6 +4571,9 @@ riscv_constant_alignment (const_tree exp, HOST_WIDE_INT align)
 
 #undef TARGET_WARN_FUNC_RETURN
 #define TARGET_WARN_FUNC_RETURN riscv_warn_func_return
+
+#undef TARGET_EMIT_STACK_ERASE
+#define TARGET_EMIT_STACK_ERASE riscv_emit_stack_erase
 
 struct gcc_target targetm = TARGET_INITIALIZER;
 

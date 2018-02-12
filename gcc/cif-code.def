@@ -139,3 +139,7 @@ DEFCIFCODE(UNREACHABLE, CIF_FINAL_ERROR,
 /* We can't inline because of instrumentation thunk.  */
 DEFCIFCODE(CHKP, CIF_FINAL_ERROR,
 	   N_("caller is instrumentation thunk"))
+
+/* We can't inline because of stack erase.  */
+DEFCIFCODE(STACK_ERASE, CIF_FINAL_ERROR,
+           N_("callee stack_erase attribute"))

@@ -102,6 +102,12 @@
 #endif
 
 
+/* Define if your target supports default stack erase and it is enabled. */
+#ifndef USED_FOR_TARGET
+#undef ENABLE_DEFAULT_STACK_ERASE
+#endif
+
+
 /* Define if you want more run-time sanity checks for dataflow. */
 #ifndef USED_FOR_TARGET
 #undef ENABLE_DF_CHECKING
