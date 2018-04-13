@@ -13391,8 +13391,17 @@ ix86_emit_outlined_ms2sysv_save (const struct ix86_frame &frame)
   RTX_FRAME_RELATED_P (insn) = true;
 }
 
-/* Expand the prologue into a bunch of separate insns.  */
+/* Implement TARGET_EMIT_STACK_ERASE.  */
 
+void
+ix86_emit_stack_erase (rtx new_sp_val)
+{
+  new_sp_val = force_reg (Pmode, new_sp_val);
+
+  emit_insn (gen_stack_erase (stack_pointer_rtx, new_sp_val));
+}
+
+/* Expand the prologue into a bunch of separate insns.  */
 void
 ix86_expand_prologue (void)
 {
@@ -14312,6 +14321,11 @@ ix86_expand_epilogue (int style)
       return;
     }
 
+  /* Store the starting value of SP in TEMP1 */
+  if (flag_stack_erase
+      || lookup_attribute ("stack_erase", DECL_ATTRIBUTES (cfun->decl)))
+    emit_move_insn (IX86_EPILOGUE_TEMP1 (Pmode), stack_pointer_rtx);
+
   ix86_finalize_stack_frame_flags ();
   const struct ix86_frame &frame = cfun->machine->frame;
 
@@ -14705,7 +14719,16 @@ ix86_expand_epilogue (int style)
 	  emit_jump_insn (gen_simple_return_indirect_internal (ecx));
 	}
       else
-	emit_jump_insn (gen_simple_return_internal ());
+        {
+          if (flag_stack_erase
+              || lookup_attribute ("stack_erase",
+                                   DECL_ATTRIBUTES (cfun->decl)))
+            {
+              emit_insn (gen_stack_erase (IX86_EPILOGUE_TEMP1 (Pmode),
+                                          stack_pointer_rtx));
+            }
+          emit_jump_insn (gen_simple_return_internal ());
+        }
     }
 
   /* Restore the state back to the state from the prologue,
@@ -28487,6 +28510,12 @@ ix86_expand_call (rtx retval, rtx fnaddr, rtx callarg1,
   if (vec_len > 1)
     call = gen_rtx_PARALLEL (VOIDmode, gen_rtvec_v (vec_len, vec));
   rtx_insn *call_insn = emit_call_insn (call);
+
+  /* erase callee return address */
+  if (flag_stack_erase
+      || lookup_attribute ("stack_erase", DECL_ATTRIBUTES (cfun->decl)))
+    emit_insn (gen_stack_erase_ret_addr (stack_pointer_rtx));
+
   if (use)
     CALL_INSN_FUNCTION_USAGE (call_insn) = use;
 
@@ -51930,6 +51959,9 @@ ix86_run_selftests (void)
 #undef TARGET_RUN_TARGET_SELFTESTS
 #define TARGET_RUN_TARGET_SELFTESTS selftest::ix86_run_selftests
 #endif /* #if CHECKING_P */
+
+#undef TARGET_EMIT_STACK_ERASE
+#define TARGET_EMIT_STACK_ERASE ix86_emit_stack_erase
 
 struct gcc_target targetm = TARGET_INITIALIZER;
 

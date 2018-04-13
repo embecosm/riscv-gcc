@@ -2125,6 +2125,9 @@ extern int const svr4_dbx_register_map[FIRST_PSEUDO_REGISTER];
 #define EH_RETURN_DATA_REGNO(N)	((N) <= DX_REG ? (N) : INVALID_REGNUM)
 #define EH_RETURN_STACKADJ_RTX	gen_rtx_REG (Pmode, CX_REG)
 
+/* Used by stack erase to store SP at start epilogue
+   40 = r11 (caller-saved register) */
+#define IX86_EPILOGUE_TEMP1(Pmode)  gen_rtx_REG (Pmode, 40)
 
 /* Select a format to encode pointers in exception handling data.  CODE
    is 0 for data, 1 for code labels, 2 for function pointers.  GLOBAL is
