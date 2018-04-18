@@ -2126,8 +2126,11 @@ extern int const svr4_dbx_register_map[FIRST_PSEUDO_REGISTER];
 #define EH_RETURN_STACKADJ_RTX	gen_rtx_REG (Pmode, CX_REG)
 
 /* Used by stack erase to store SP at start epilogue
-   40 = r11 (caller-saved register) */
-#define IX86_EPILOGUE_TEMP1(Pmode)  gen_rtx_REG (Pmode, 40)
+   39 = r10, 40 = r11 (caller-saved temporary registers) */
+#define IX86_REGISTER_R10 39
+#define IX86_REGISTER_R11 40
+#define IX86_EPILOGUE_TEMP1(Pmode)  gen_rtx_REG (Pmode, IX86_REGISTER_R10)
+#define IX86_EPILOGUE_TEMP2(Pmode)  gen_rtx_REG (Pmode, IX86_REGISTER_R11)
 
 /* Select a format to encode pointers in exception handling data.  CODE
    is 0 for data, 1 for code labels, 2 for function pointers.  GLOBAL is
