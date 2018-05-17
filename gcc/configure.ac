@@ -5991,7 +5991,7 @@ AC_ARG_ENABLE(default-stack-erase,
 [AS_HELP_STRING([--enable-default-stack-erase],
   [enable Stack Erase by default])],[
 case "$target" in
-  riscv*-*-*) enable_default_stack_erase=$enableval ;;
+  riscv*-*-*|x86_64*-*-*) enable_default_stack_erase=$enableval ;;
   *) AC_MSG_ERROR([Default stack erase is not supported on this target.]) ;;
 esac
 ],

@@ -29359,7 +29359,7 @@ fi
 if test "${enable_default_stack_erase+set}" = set; then :
   enableval=$enable_default_stack_erase;
 case "$target" in
-  riscv*-*-*) enable_default_stack_erase=$enableval ;;
+  riscv*-*-*|x86_64*-*-*) enable_default_stack_erase=$enableval ;;
   *) as_fn_error "Default stack erase is not supported on this target." "$LINENO" 5 ;;
 esac
 
