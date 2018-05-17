@@ -14325,7 +14325,7 @@ ix86_expand_epilogue (int style)
   if (flag_stack_erase
       || lookup_attribute ("stack_erase", DECL_ATTRIBUTES (cfun->decl)))
     emit_move_insn (IX86_EPILOGUE_TEMP1 (Pmode), stack_pointer_rtx);
-
+  
   ix86_finalize_stack_frame_flags ();
   const struct ix86_frame &frame = cfun->machine->frame;
 
@@ -14724,8 +14724,18 @@ ix86_expand_epilogue (int style)
               || lookup_attribute ("stack_erase",
                                    DECL_ATTRIBUTES (cfun->decl)))
             {
+              // change temp1 to end of red zone
+              if (ix86_using_red_zone ())
+                {
+                  rtx rzs = GEN_INT (RED_ZONE_SIZE);
+                  emit_insn (
+                    ix86_gen_sub3 (IX86_EPILOGUE_TEMP1 (Pmode),
+                                   IX86_EPILOGUE_TEMP1 (Pmode),
+                                   rzs));
+                }
               emit_insn (gen_stack_erase (IX86_EPILOGUE_TEMP1 (Pmode),
                                           stack_pointer_rtx));
+	      emit_insn (gen_prologue_use (IX86_EPILOGUE_TEMP1 (Pmode)));
             }
           emit_jump_insn (gen_simple_return_internal ());
         }
