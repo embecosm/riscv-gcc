@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-O2 -fno-stack-erase -mno-red-zone" } */
+/* { dg-options "-O2 -fno-stack-erase" } */
 
 /* Simple function that uses the stack */
 __attribute__((stack_erase))
