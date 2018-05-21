@@ -14303,6 +14303,28 @@ ix86_emit_outlined_ms2sysv_restore (const struct ix86_frame &frame,
     }
 }
 
+/* Insert stack erase code */
+void
+expand_stack_erase () {
+  if (flag_stack_erase
+      || lookup_attribute ("stack_erase",
+                           DECL_ATTRIBUTES (cfun->decl)))
+    {
+      // change temp1 to end of red zone
+      if (ix86_using_red_zone ())
+        {
+          rtx rzs = GEN_INT (RED_ZONE_SIZE);
+          emit_insn (
+            ix86_gen_sub3 (IX86_EPILOGUE_TEMP1 (Pmode),
+                           IX86_EPILOGUE_TEMP1 (Pmode),
+                           rzs));
+        }
+      emit_insn (gen_stack_erase (IX86_EPILOGUE_TEMP1 (Pmode),
+                                  stack_pointer_rtx));
+      emit_insn (gen_prologue_use (IX86_EPILOGUE_TEMP1 (Pmode)));
+    }
+}
+
 /* Restore function stack, frame, and registers.  */
 
 void
@@ -14656,12 +14678,16 @@ ix86_expand_epilogue (int style)
   /* Sibcall epilogues don't want a return instruction.  */
   if (style == 0)
     {
+      expand_stack_erase ();
       m->fs = frame_state_save;
       return;
     }
 
   if (cfun->machine->func_type != TYPE_NORMAL)
-    emit_jump_insn (gen_interrupt_return ());
+    {
+      expand_stack_erase ();
+      emit_jump_insn (gen_interrupt_return ());
+    }
   else if (crtl->args.pops_args && crtl->args.size)
     {
       rtx popc = GEN_INT (crtl->args.pops_args);
@@ -14675,6 +14701,7 @@ ix86_expand_epilogue (int style)
 	  rtx_insn *insn;
 
 	  /* There is no "pascal" calling convention in any 64bit ABI.  */
+	  /*TODO handle this case for 32bit stack erase */
 	  gcc_assert (!TARGET_64BIT);
 
 	  insn = emit_insn (gen_pop (ecx));
@@ -14692,7 +14719,10 @@ ix86_expand_epilogue (int style)
 	  emit_jump_insn (gen_simple_return_indirect_internal (ecx));
 	}
       else
-	emit_jump_insn (gen_simple_return_pop_internal (popc));
+	{
+	  expand_stack_erase ();
+	  emit_jump_insn (gen_simple_return_pop_internal (popc));
+	}
     }
   else if (!m->call_ms2sysv || !restore_stub_is_tail)
     {
@@ -14716,27 +14746,12 @@ ix86_expand_epilogue (int style)
 	  add_reg_note (insn, REG_CFA_REGISTER, gen_rtx_SET (ecx, pc_rtx));
 	  RTX_FRAME_RELATED_P (insn) = 1;
 
+	  expand_stack_erase ();
 	  emit_jump_insn (gen_simple_return_indirect_internal (ecx));
 	}
       else
         {
-          if (flag_stack_erase
-              || lookup_attribute ("stack_erase",
-                                   DECL_ATTRIBUTES (cfun->decl)))
-            {
-              // change temp1 to end of red zone
-              if (ix86_using_red_zone ())
-                {
-                  rtx rzs = GEN_INT (RED_ZONE_SIZE);
-                  emit_insn (
-                    ix86_gen_sub3 (IX86_EPILOGUE_TEMP1 (Pmode),
-                                   IX86_EPILOGUE_TEMP1 (Pmode),
-                                   rzs));
-                }
-              emit_insn (gen_stack_erase (IX86_EPILOGUE_TEMP1 (Pmode),
-                                          stack_pointer_rtx));
-	      emit_insn (gen_prologue_use (IX86_EPILOGUE_TEMP1 (Pmode)));
-            }
+          expand_stack_erase ();
           emit_jump_insn (gen_simple_return_internal ());
         }
     }
