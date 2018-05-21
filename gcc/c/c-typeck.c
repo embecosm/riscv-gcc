@@ -3065,6 +3065,20 @@ build_function_call_vec (location_t loc, vec<location_t> arg_loc,
       return error_mark_node;
     }
 
+  /* Functions with the stack_erase attribute may only call other functions with
+     the stack_erase attribute.  */
+  if (lookup_attribute ("stack_erase",
+                        DECL_ATTRIBUTES (current_function_decl))
+      && fundecl
+      && !(lookup_attribute ("stack_erase", DECL_ATTRIBUTES (fundecl))))
+    {
+      error_at (loc,
+                "Cannot call non-stack-erase function %qD "
+                "from stack-erase function",
+                fundecl);
+      inform_declaration (fundecl);
+    }
+
   if (fundecl && TREE_THIS_VOLATILE (fundecl))
     current_function_returns_abnormally = 1;
 
