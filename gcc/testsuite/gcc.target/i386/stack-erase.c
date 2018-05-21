@@ -88,6 +88,45 @@ int f6 (int x, int y)
   return a[y];
 }
 
+/* tail call */
+/* f7 pushes 200 more ints onto the stack than f1 */
+__attribute__((stack_erase))
+int f7 (int x, int y) {
+  volatile int a[500], s;
+  for (int i = 0; i < x; i++)
+  {
+    a[i] = a[i] + x;
+  }
+  return f1(x, y);
+}
+
+/* recursion */
+__attribute__((stack_erase))
+int fib(int i)
+{
+  volatile int a = 5678;
+  if(i==0)
+    return 1;
+  if(i==1)
+    return 1;
+  return fib(i-1) + fib(i-2);
+}
+
+__attribute__((stack_erase))
+int f8 (int x, int y) {
+  volatile int a = 1234;
+  return fib(x-y);
+}
+
+/* Stack erase function calling non-stack erase function */
+/* should we generate a warning/error for this scenario? */
+__attribute__((stack_erase))
+int f9 (int x, int y)
+{
+  int a = f5 (x, y);
+  return a + 4;
+}
+
 int test(int (*func) (int, int))
 {
   // Zero 2kb of stack space and record SP
@@ -136,7 +175,7 @@ int test(int (*func) (int, int))
   "  jmp     5f\n"
   "5:\n"
   "  movq    %3, %%rsp"
-  : "=r" (stack_check), "+r" (t1), "+r" (t2)
+  : "+r" (stack_check), "+r" (t1), "+r" (t2)
   : "r" (initial_sp) : );
 
   return stack_check;
@@ -158,5 +197,13 @@ int main (void) {
     return 5;
   if ((r = test (f6)))
     return 6;
+  /* Tail call. */
+  if ((r = test (f7)))
+    return 7;
+  if ((r = test (f8)))
+    return 8;
+  /* Stack erase function calling non-stack erase function. */
+  // if ((r = test (f9)) != 1)
+  //   return 9;
   return 0;
 }
