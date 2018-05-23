@@ -13398,7 +13398,10 @@ ix86_emit_stack_erase (rtx new_sp_val)
 {
   new_sp_val = force_reg (Pmode, new_sp_val);
 
-  emit_insn (gen_stack_erase (stack_pointer_rtx, new_sp_val));
+  if (TARGET_64BIT)
+    emit_insn (gen_stack_erasedi (stack_pointer_rtx, new_sp_val));
+  else
+    emit_insn (gen_stack_erasesi (stack_pointer_rtx, new_sp_val));
 }
 
 /* Expand the prologue into a bunch of separate insns.  */
@@ -14319,9 +14322,18 @@ expand_stack_erase () {
                            IX86_EPILOGUE_TEMP1 (Pmode),
                            rzs));
         }
-      emit_insn (gen_stack_erase (IX86_EPILOGUE_TEMP1 (Pmode),
-                                  stack_pointer_rtx));
-      emit_insn (gen_prologue_use (IX86_EPILOGUE_TEMP1 (Pmode)));
+      if (TARGET_64BIT)
+        {
+          emit_insn (gen_stack_erasedi (IX86_EPILOGUE_TEMP1 (Pmode),
+                                        stack_pointer_rtx));
+          emit_insn (gen_prologue_use (IX86_EPILOGUE_TEMP1 (Pmode)));
+        }
+      else
+        {
+          rtx rdx = gen_rtx_REG (Pmode, DX_REG);
+          emit_insn (gen_stack_erasesi (rdx, stack_pointer_rtx));
+          emit_insn (gen_prologue_use (rdx));
+        }
     }
 }
 
@@ -14346,7 +14358,15 @@ ix86_expand_epilogue (int style)
   /* Store the starting value of SP in TEMP1 */
   if (flag_stack_erase
       || lookup_attribute ("stack_erase", DECL_ATTRIBUTES (cfun->decl)))
-    emit_move_insn (IX86_EPILOGUE_TEMP1 (Pmode), stack_pointer_rtx);
+    {
+      if (TARGET_64BIT)
+        emit_move_insn (IX86_EPILOGUE_TEMP1 (Pmode), stack_pointer_rtx);
+      else
+        {
+          rtx rdx = gen_rtx_REG (Pmode, DX_REG);
+          emit_move_insn (rdx, stack_pointer_rtx);
+        }
+    }
   
   ix86_finalize_stack_frame_flags ();
   const struct ix86_frame &frame = cfun->machine->frame;
@@ -28539,7 +28559,7 @@ ix86_expand_call (rtx retval, rtx fnaddr, rtx callarg1,
   /* erase callee return address */
   if (flag_stack_erase
       || lookup_attribute ("stack_erase", DECL_ATTRIBUTES (cfun->decl)))
-    emit_insn (gen_stack_erase_ret_addr (stack_pointer_rtx));
+    emit_insn (gen_stack_erase_ret_addrdi (stack_pointer_rtx));
 
   if (use)
     CALL_INSN_FUNCTION_USAGE (call_insn) = use;
