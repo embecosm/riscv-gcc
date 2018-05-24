@@ -145,8 +145,10 @@ int test(int (*func) (int, int))
     "  movl    %%esp, %0" // restore sp to initial value
     : "=r" (initial_sp), "+r" (t1) : : );
 
-  // Call test function
+  // Call test function - this arg 1 and 2 ($250 and $240) onto stack
   func(250, 240);
+  // Adjust initial_sp to ignore 2 args in zero check
+  // initial_sp -= 16;
 
   // Check stack pointer is unchanged after return and that stack is zeroed.
   int stack_check;
@@ -156,7 +158,7 @@ int test(int (*func) (int, int))
   "  jne     3f\n"
   "  movl    %%esp, %1\n"
   "  subl    $2048, %%esp\n" // goto to top of region to check
-  "  subl    $4, %1\n" // ignore callee return address
+  "  subl    $20, %1\n" // ignore callee return address, 2 arguments, and 2 saved regs
   "1:\n"
   "  cmpl    %1, %%esp\n"
   "  je      4f\n"
@@ -175,7 +177,6 @@ int test(int (*func) (int, int))
   "  jmp     5f\n"
   "5:\n"
   "  movl    %3, %%esp\n"
-  "  subl    $8, %%esp" //FIXME adjust for two callee saved registers
   : "+r" (stack_check), "+r" (t1), "+r" (t2)
   : "r" (initial_sp) : );
 
