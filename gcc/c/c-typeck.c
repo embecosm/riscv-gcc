@@ -3067,8 +3067,9 @@ build_function_call_vec (location_t loc, vec<location_t> arg_loc,
 
   /* Functions with the stack_erase attribute may only call other functions with
      the stack_erase attribute.  */
-  if (lookup_attribute ("stack_erase",
-                        DECL_ATTRIBUTES (current_function_decl))
+  if (current_function_decl
+      && lookup_attribute ("stack_erase",
+                           DECL_ATTRIBUTES (current_function_decl))
       && fundecl
       && !(lookup_attribute ("stack_erase", DECL_ATTRIBUTES (fundecl))))
     {
