@@ -16,7 +16,7 @@ int f1 (int x, int y)
 /* For preventing VLA in f2 getting optimized away.  */
 int f2_glob = 7;
 
-__attribute__((noinline))
+__attribute__((noinline, stack_erase))
 int f2_sub ()
 {
   return f2_glob;
@@ -118,13 +118,24 @@ int f8 (int x, int y) {
   return fib(x-y);
 }
 
-/* Stack erase function calling non-stack erase function */
-/* should we generate a warning/error for this scenario? */
 __attribute__((stack_erase))
-int f9 (int x, int y)
-{
-  int a = f5 (x, y);
-  return a + 4;
+int f9_args(int a0,  int a1,  int a2,  int a3,  int a4,  int a5,  int a6,  int a7,
+             int a8,  int a9,  int a10, int a11, int a12, int a13, int a14, int a15,
+             int a16, int a17, int a18, int a19, int a20, int a21, int a22, int a23,
+             int a24, int a25) {
+  int a = f1 (a0, a1);
+  return a + 7;  
+}
+
+/* test that caller clears pushed arguments */
+__attribute__((stack_erase))
+int f9 (int x, int y) {
+  int a = f1 (x, y);
+  int b = f9_args(0,  1,  2,  3,  4,  5,  6,  7, 
+                   8,  9,  10, 11, 12, 13, 14, 15,
+                   16, 17, 18, 19, 20, 21, 22, 23,
+                   24, 25);
+  return a + b + 10;
 }
 
 int test(int (*func) (int, int))
@@ -199,13 +210,11 @@ int main (void) {
     return 5;
   if ((r = test (f6)))
     return 6;
-  /* Tail call. */
   if ((r = test (f7)))
     return 7;
   if ((r = test (f8)))
     return 8;
-  /* Stack erase function calling non-stack erase function. */
-  // if ((r = test (f9)) != 1)
-  //   return 9;
+  if ((r = test (f9)))
+    return 9;
   return 0;
 }
