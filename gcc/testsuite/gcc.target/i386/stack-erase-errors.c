@@ -1,8 +1,8 @@
 /* { dg-do run } */
-/* { dg-options "-O0 -fno-stack-erase" } */
+/* { dg-options "-O2 -fno-stack-erase" } */
 
 /* Non-stack erase function does not result in a clear stack.  */
-int f5 (int x, int y)
+int f1_sub (int x, int y)
 {
   int a[300], s;
   for (int i = 0; i < x; i++)
@@ -16,11 +16,41 @@ int f5 (int x, int y)
 /* Stack erase function calling non-stack erase function */
 /* should we generate a warning/error for this scenario? */
 __attribute__((stack_erase))
-int f9 (int x, int y)
+int f1 (int x, int y)
 {
-  int a = f5 (x, y);
+  int a = f1_sub (x, y); /* { dg-error "Cannot call non-stack-erase function 'f1_sub' from stack-erase function" } */
   return a + 4;
 }
+
+__attribute__((stack_erase))
+int f2_sub (int (*myfunc) (int, int) __attribute__((stack_erase)), int x, int y)
+{
+  myfunc(x, y); // should be an error here
+}
+
+__attribute__((stack_erase))
+int f2 (int x, int y)
+{
+  f2_sub (f1_sub, x ,y);
+}
+
+__attribute__((stack_erase))
+int f3 (int x, int y); /* { dg-error "'stack_erase' attribute present on 'f3'" } */
+
+int f3 (int x, int y) /* { dg-error "but not here" } */
+{
+  return x + y;
+}
+
+int f4 (int x, int y); /* { dg-error "but not here" } */
+
+__attribute__((stack_erase))
+int f4 (int x, int y) /* { dg-error "'stack_erase' attribute present on 'f4'" } */
+{
+  return x + y;
+}
+
+/* always inline stack erase function error */
 
 int test(int (*func) (int, int))
 {
@@ -79,7 +109,9 @@ int test(int (*func) (int, int))
 int main (void) {
   int r;
   /* Stack erase function calling non-stack erase function. */
-  if ((r = test (f9)))
-    return 9;
+  if ((r = test (f1)))
+    return 1;
+  if ((r = test (f3)))
+    return 3;
   return 0;
 }
