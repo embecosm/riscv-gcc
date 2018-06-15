@@ -1,4 +1,4 @@
-/* { dg-do run } */
+/* { dg-do compile } */
 /* { dg-options "-O2 -fno-stack-erase" } */
 
 /* Non-stack erase function does not result in a clear stack.  */
@@ -22,10 +22,23 @@ int f1 (int x, int y)
   return a + 4;
 }
 
+// __attribute__((stack_erase))
+// int f2_sub (int (*myfunc) (int, int) __attribute__((stack_erase)), int x, int y)
+// {
+//   myfunc(x, y); // should be an error here
+// }
+
+// __attribute__((stack_erase))
+// int f2 (int x, int y)
+// {
+//   f2_sub (f1_sub, x ,y);
+// }
+
+/* calling by pointer-to-function not allowed in stack-erase function */
 __attribute__((stack_erase))
-int f2_sub (int (*myfunc) (int, int) __attribute__((stack_erase)), int x, int y)
+int f2_sub (int (*myfunc) (int, int), int x, int y)
 {
-  myfunc(x, y); // should be an error here
+  myfunc(x, y); /* { dg-error "cannot call using function pointer 'myfunc' from stack-erase function" } */
 }
 
 __attribute__((stack_erase))
@@ -51,6 +64,10 @@ int f4 (int x, int y) /* { dg-error "'stack_erase' attribute present on 'f4'" } 
 }
 
 /* always inline stack erase function error */
+// __attribute__((stack_erase, always_inline))
+// int f5 (int x, int y) {
+//   return x + y;
+// }
 
 int test(int (*func) (int, int))
 {
