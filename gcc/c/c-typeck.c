@@ -3017,6 +3017,14 @@ build_function_call_vec (location_t loc, vec<location_t> arg_loc,
   /* Strip NON_LVALUE_EXPRs, etc., since we aren't using as an lvalue.  */
   STRIP_TYPE_NOPS (function);
 
+  /* calls using pointer-to-function are not allowed in stack-erase functions */
+  if (TREE_CODE (TREE_TYPE (function)) == POINTER_TYPE
+      && lookup_attribute ("stack_erase",
+                           DECL_ATTRIBUTES (current_function_decl)))
+    error_at (loc,
+              "cannot call using function pointer %qD from stack-erase "
+              "function", function);
+
   /* Convert anything with function type to a pointer-to-function.  */
   if (TREE_CODE (function) == FUNCTION_DECL)
     {
