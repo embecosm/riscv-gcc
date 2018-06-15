@@ -917,7 +917,6 @@ promote_ssa_mode (const_tree name, int *punsignedp)
 static bool suppress_reg_args_size;
 
 /* A helper for adjust_stack and anti_adjust_stack.  */
-
 static void
 adjust_stack_1 (rtx adjust, bool anti_p)
 {
@@ -928,10 +927,26 @@ adjust_stack_1 (rtx adjust, bool anti_p)
   if (!STACK_GROWS_DOWNWARD)
     anti_p = !anti_p;
 
-  temp = expand_binop (Pmode,
-		       anti_p ? sub_optab : add_optab,
-		       stack_pointer_rtx, adjust, stack_pointer_rtx, 0,
-		       OPTAB_LIB_WIDEN);
+  /* FIXME stack erase assumes downward growing stack
+           add error if (flag_stack_erase && !STACK_GROWS_DOWNWARD), or
+           support upward growing stack in stack erase */
+  /* Calling stack erase will also adjust the stack */
+  if ((flag_stack_erase
+      || lookup_attribute ("stack_erase", DECL_ATTRIBUTES (cfun->decl)))
+      && !anti_p && STACK_GROWS_DOWNWARD)
+    {
+      temp = expand_binop (Pmode, add_optab, adjust, stack_pointer_rtx, adjust, 0,
+             OPTAB_LIB_WIDEN);
+
+      targetm.emit_stack_erase (temp);
+    }
+  else
+    {
+      temp = expand_binop (Pmode,
+                           anti_p ? sub_optab : add_optab,
+                           stack_pointer_rtx, adjust, stack_pointer_rtx, 0,
+                           OPTAB_LIB_WIDEN);
+    }
 
   if (temp != stack_pointer_rtx)
     insn = emit_move_insn (stack_pointer_rtx, temp);
@@ -944,6 +959,7 @@ adjust_stack_1 (rtx adjust, bool anti_p)
 
   if (!suppress_reg_args_size)
     add_args_size_note (insn, stack_pointer_delta);
+
 }
 
 /* Adjust the stack pointer by ADJUST (an rtx for a number of bytes).
@@ -1138,7 +1154,6 @@ emit_stack_restore (enum save_level save_level, rtx sa)
     }
 
   discard_pending_stack_adjust ();
-
   if (flag_stack_erase
       || lookup_attribute ("stack_erase", DECL_ATTRIBUTES (cfun->decl)))
     targetm.emit_stack_erase (sa);
