@@ -1,12 +1,5 @@
 /* { dg-do run } */
 /* { dg-options "-O0 -fno-stack-erase" } */
-/* { dg-options "-O1 -fno-stack-erase" } */
-/* { dg-options "-O2 -fno-stack-erase" } */
-/* { dg-options "-O3 -fno-stack-erase" } */
-/* { dg-options "-O0 -fno-stack-erase -mno-red-zone" } */
-/* { dg-options "-O1 -fno-stack-erase -mno-red-zone" } */
-/* { dg-options "-O2 -fno-stack-erase -mno-red-zone" } */
-/* { dg-options "-O3 -fno-stack-erase -mno-red-zone" } */
 
 /* Simple function that uses the stack */
 __attribute__((stack_erase))
@@ -187,12 +180,13 @@ int test(int (*func) (int, int))
   "  jmp     5f\n"
   "3:\n"
   "  movl    $2, %0\n"
-  "  jmp     5f\n"
+  "  jmp     6f\n" // if sp changed, retain new value to return properly
   "4:\n"
   "  movl    $0, %0\n"
   "  jmp     5f\n"
   "5:\n"
-  "  movq    %3, %%rsp"
+  "  movq    %3, %%rsp\n"
+  "6:\n"
   : "+r" (stack_check), "+r" (t1), "+r" (t2)
   : "r" (initial_sp) : );
 
