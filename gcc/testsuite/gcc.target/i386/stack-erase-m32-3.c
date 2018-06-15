@@ -1,5 +1,5 @@
 /* { dg-do run } */
-/* { dg-options "-O1 -fno-stack-erase -m32" } */
+/* { dg-options "-O0 -fno-stack-erase -m32" } */
 
 /* Simple function that uses the stack */
 __attribute__((stack_erase))
@@ -154,7 +154,6 @@ int test(int (*func) (int, int))
     "2:\n"
     "  addl    $2048, %%esp\n" // restore sp to initial value
     "  movl    %%esp, %0\n"
-    "  subl    $8, %0" // adjust initial_sp to ignore two pushed args
     : "+r" (initial_sp) : : );
 
   // Call test function 
@@ -179,7 +178,8 @@ int test(int (*func) (int, int))
   "  jne     3f\n"
   "  movl    %%esp, %1\n"
   "  subl    $2048, %%esp\n" // goto to top of region to check
-  "  subl    $4, %1\n" // ignore callee return address
+  "  subl    $20, %1\n" // ignore callee return address and 2 arguments, and
+                        // 2 bytes padding
   "1:\n"
   "  cmpl    %1, %%esp\n"
   "  je      4f\n"
