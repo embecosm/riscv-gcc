@@ -14902,7 +14902,8 @@ ix86_expand_epilogue (int style)
 	  add_reg_note (insn, REG_CFA_REGISTER, gen_rtx_SET (ecx, pc_rtx));
 	  RTX_FRAME_RELATED_P (insn) = 1;
 
-	  pro_epilogue_adjust_stack (stack_pointer_rtx, stack_pointer_rtx,
+	  expand_stack_erase ();
+    pro_epilogue_adjust_stack (stack_pointer_rtx, stack_pointer_rtx,
 				     popc, -1, true);
 	  emit_jump_insn (gen_simple_return_indirect_internal (ecx));
 	}
