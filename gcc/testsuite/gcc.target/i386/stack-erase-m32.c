@@ -178,7 +178,7 @@ int test(int (*func) (int, int))
   "  cmpl    %%esp, %3\n" // check sp unchanged
   "  jne     3f\n"
   "  movl    %%esp, %1\n"
-  "  subl    $2048, %%esp\n" // goto to top of region to check
+  "  subl    $2040, %%esp\n" // goto to top of region to check
   "  subl    $4, %1\n" // ignore callee return address
   "1:\n"
   "  cmpl    %1, %%esp\n"
