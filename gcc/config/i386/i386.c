@@ -14476,7 +14476,7 @@ ix86_emit_outlined_ms2sysv_restore (const struct ix86_frame &frame,
 
 /* Insert stack erase code */
 void
-expand_stack_erase () {
+emit_stack_erase2 () {
   if (flag_stack_erase
       || lookup_attribute ("stack_erase",
                            DECL_ATTRIBUTES (cfun->decl)))
@@ -14866,14 +14866,14 @@ ix86_expand_epilogue (int style)
   /* Sibcall epilogues don't want a return instruction.  */
   if (style == 0)
     {
-      expand_stack_erase ();
+      emit_stack_erase2 ();
       m->fs = frame_state_save;
       return;
     }
 
   if (cfun->machine->func_type != TYPE_NORMAL)
     {
-      expand_stack_erase ();
+      emit_stack_erase2 ();
       emit_jump_insn (gen_interrupt_return ());
     }
   else if (crtl->args.pops_args && crtl->args.size)
@@ -14902,14 +14902,14 @@ ix86_expand_epilogue (int style)
 	  add_reg_note (insn, REG_CFA_REGISTER, gen_rtx_SET (ecx, pc_rtx));
 	  RTX_FRAME_RELATED_P (insn) = 1;
 
-	  expand_stack_erase ();
+	  emit_stack_erase2 ();
     pro_epilogue_adjust_stack (stack_pointer_rtx, stack_pointer_rtx,
 				     popc, -1, true);
 	  emit_jump_insn (gen_simple_return_indirect_internal (ecx));
 	}
       else
 	{
-	  expand_stack_erase ();
+	  emit_stack_erase2 ();
 	  emit_jump_insn (gen_simple_return_pop_internal (popc));
 	}
     }
@@ -14935,12 +14935,12 @@ ix86_expand_epilogue (int style)
 	  add_reg_note (insn, REG_CFA_REGISTER, gen_rtx_SET (ecx, pc_rtx));
 	  RTX_FRAME_RELATED_P (insn) = 1;
 
-	  expand_stack_erase ();
+	  emit_stack_erase2 ();
 	  emit_jump_insn (gen_simple_return_indirect_internal (ecx));
 	}
       else
         {
-          expand_stack_erase ();
+          emit_stack_erase2 ();
           emit_jump_insn (gen_simple_return_internal ());
         }
     }
