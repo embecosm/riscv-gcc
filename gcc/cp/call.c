@@ -8828,6 +8828,22 @@ build_cxx_call (tree fn, int nargs, tree *argarray,
 
   fndecl = get_callee_fndecl (fn);
 
+  /* Functions with the stack_erase attribute may only call other functions with
+   the stack_erase attribute.  */
+  if (current_function_decl
+      && lookup_attribute ("stack_erase",
+                           DECL_ATTRIBUTES (current_function_decl))
+      && fndecl
+      && !(lookup_attribute ("stack_erase", DECL_ATTRIBUTES (fndecl))))
+    {
+      error ("Cannot call non-stack-erase function %qD "
+             "from stack-erase function",
+             fndecl);
+      // location_t loc = DECL_SOURCE_LOCATION (function);
+      // diagnose_constraints (loc, function, NULL_TREE);
+      return error_mark_node;
+    }
+
   /* Check that arguments to builtin functions match the expectations.  */
   if (fndecl
       && !processing_template_decl
