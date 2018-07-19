@@ -3670,6 +3670,17 @@ cp_build_function_call_vec (tree function, vec<tree, va_gc> **params,
       && TREE_TYPE (function) == TREE_TYPE (TREE_OPERAND (function, 0)))
     function = TREE_OPERAND (function, 0);
 
+
+  /* calls using pointer-to-function are not allowed in stack-erase functions */
+  if (TREE_CODE (TREE_TYPE (function)) == POINTER_TYPE
+      && lookup_attribute ("stack_erase",
+                           DECL_ATTRIBUTES (current_function_decl))) {
+    // location_t loc = DECL_SOURCE_LOCATION (function);
+    error ("cannot call using function pointer %qD from stack-erase "
+           "function", function);
+    return error_mark_node;
+  }
+
   if (TREE_CODE (function) == FUNCTION_DECL)
     {
       /* If the function is a non-template member function
