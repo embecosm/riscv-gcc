@@ -2117,19 +2117,6 @@ diagnose_mismatched_decls (tree newdecl, tree olddecl,
 	    }
 	}
 
-      /* Make sure stack_erase attribute is either not present, or
-         present on all decls.  */
-      bool newsea = lookup_attribute ("stack_erase",
-                                      DECL_ATTRIBUTES (newdecl)) != NULL;
-      bool oldsea = lookup_attribute ("stack_erase",
-                                      DECL_ATTRIBUTES (olddecl)) != NULL;
-      if (newsea != oldsea)
-        {
-          error_at (input_location, "%<stack_erase%> attribute present on %q+D",
-                    newsea ? newdecl : olddecl);
-          error_at (DECL_SOURCE_LOCATION (newsea ? olddecl : newdecl),
-                    "but not here");
-        }
     }
   else if (VAR_P (newdecl))
     {
