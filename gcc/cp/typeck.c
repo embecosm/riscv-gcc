@@ -3672,7 +3672,9 @@ cp_build_function_call_vec (tree function, vec<tree, va_gc> **params,
 
 
   /* calls using pointer-to-function are not allowed in stack-erase functions */
-  if (TREE_CODE (TREE_TYPE (function)) == POINTER_TYPE
+  if (function
+      && TREE_CODE (TREE_TYPE (function)) == POINTER_TYPE
+      && current_function_decl
       && lookup_attribute ("stack_erase",
                            DECL_ATTRIBUTES (current_function_decl))) {
     // location_t loc = DECL_SOURCE_LOCATION (function);
