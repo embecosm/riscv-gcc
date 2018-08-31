@@ -1156,7 +1156,22 @@ emit_stack_restore (enum save_level save_level, rtx sa)
   discard_pending_stack_adjust ();
   if (flag_stack_erase
       || lookup_attribute ("stack_erase", DECL_ATTRIBUTES (cfun->decl)))
-    targetm.emit_stack_erase (sa);
+      {
+	rtx new_sp_val;
+	if (save_level == SAVE_NONLOCAL)
+	  {
+	    /* retrieve sp from non local save area */
+	    if ((flag_cf_protection & CF_RETURN))
+	      /* first slot holds shadow stack pointer, second slot holds sp */
+	      new_sp_val = adjust_address (sa, Pmode, UNITS_PER_WORD);
+	    else
+	      /* first slot holds sp */
+	      new_sp_val = adjust_address (sa, Pmode, 0);
+	  }
+	else
+	  new_sp_val = sa;
+	targetm.emit_stack_erase (new_sp_val);
+      }
 
   emit_insn (fcn (stack_pointer_rtx, sa));
 }
