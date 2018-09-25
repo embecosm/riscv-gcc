@@ -13399,7 +13399,18 @@ ix86_emit_stack_erase (rtx new_sp_val)
   new_sp_val = force_reg (Pmode, new_sp_val);
 
   if (TARGET_64BIT)
-    emit_insn (gen_stack_erasedi (stack_pointer_rtx, new_sp_val));
+    {
+      emit_insn (gen_stack_erasedi (stack_pointer_rtx, new_sp_val));
+
+      // rtx old_sp_val = gen_reg_rtx (Pmode);
+
+      // emit_move_insn (old_sp_val, stack_pointer_rtx);
+      // emit_move_insn (stack_pointer_rtx, new_sp_val); // line breaks things
+      // emit_insn (gen_stack_erase_pushdi (old_sp_val, stack_pointer_rtx,
+					 // new_sp_val));
+      // emit_insn (gen_prologue_use (old_sp_val)); // might need this
+      // emit_insn (gen_prologue_use (new_sp_val)); // might need this
+    }
   else
     emit_insn (gen_stack_erasesi (stack_pointer_rtx, new_sp_val));
 }
@@ -14324,9 +14335,14 @@ emit_stack_erase2 () {
         }
       if (TARGET_64BIT)
         {
-          emit_insn (gen_stack_erasedi (IX86_EPILOGUE_TEMP1 (Pmode),
-                                        stack_pointer_rtx));
+          /* IX86_EPILOGUE_TEMP2 stores where rsp should end up.  */
+          emit_move_insn (IX86_EPILOGUE_TEMP2 (Pmode),
+			  stack_pointer_rtx);
+          emit_insn (gen_stack_erase_pushdi (IX86_EPILOGUE_TEMP1 (Pmode),
+                                        stack_pointer_rtx,
+                                        IX86_EPILOGUE_TEMP2 (Pmode)));
           emit_insn (gen_prologue_use (IX86_EPILOGUE_TEMP1 (Pmode)));
+          emit_insn (gen_prologue_use (IX86_EPILOGUE_TEMP2 (Pmode)));
         }
       else
         {
