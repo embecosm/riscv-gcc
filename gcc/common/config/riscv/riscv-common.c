@@ -800,7 +800,10 @@ riscv_parse_arch_string (const char *isa, struct gcc_options *opts, location_t l
 
   /* Handle specific bitmanip ISA extensions.  */
   if (riscv_have_bitmanip_z_ext_string_p (subset_list))
-    riscv_set_bitmanip_z_ext_flags (opts, subset_list);
+    {
+      *flags |= MASK_BITMANIP;
+      riscv_set_bitmanip_z_ext_flags (opts, subset_list);
+    }
 
   if (current_subset_list)
     delete current_subset_list;
