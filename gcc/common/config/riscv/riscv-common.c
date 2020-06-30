@@ -745,7 +745,7 @@ riscv_parse_arch_string (const char *isa, struct gcc_options *opts, location_t l
   int *flags = &opts->x_target_flags;
 
   /* Bitmanip ISA Z-extension flags.  */
-  long int *bitmanip_flags = &opts->x_riscv_bitmanip_subset_flags;
+  HOST_WIDE_INT *bitmanip_flags = &opts->x_riscv_bitmanip_subset_flags;
 
   subset_list = riscv_subset_list::parse (isa, loc);
 
